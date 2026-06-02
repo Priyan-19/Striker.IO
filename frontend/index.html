@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Striker.IO — Daily Habit Tracker</title>
+  <meta name="description"
+    content="Track your daily habits and streaks with Striker.IO — a visual contribution grid that shows your consistency and growth over time." />
+  <link rel="stylesheet" href="/static/css/styles.css?v=6" />
+</head>
+
+<body>
+
+  <!-- Floating glass orbs for depth effect -->
+  <div class="glass-orb glass-orb-1"></div>
+  <div class="glass-orb glass-orb-2"></div>
+  <div class="glass-orb glass-orb-3"></div>
+
+  <!-- ============================================================
+       AUTH SCREEN
+       ============================================================ -->
+  <div id="auth-screen">
+    <div class="auth-container">
+      <div class="auth-logo">
+        <div class="logo-wordmark">Striker.IO</div>
+        <div class="logo-sub">Streak Tracker</div>
+      </div>
+
+      <div class="auth-card">
+        <div class="auth-tabs">
+          <button class="auth-tab-btn active" id="tab-login" onclick="switchAuthTab('login')">Sign In</button>
+          <button class="auth-tab-btn" id="tab-register" onclick="switchAuthTab('register')">Create Account</button>
+        </div>
+
+        <!-- Login Form -->
+        <form class="auth-form active" id="form-login" onsubmit="handleLogin(event)">
+          <div class="form-group">
+            <label for="login-username">Username</label>
+            <input type="text" id="login-username" placeholder="your_username" required autocomplete="username" />
+          </div>
+          <div class="form-group">
+            <label for="login-password">Password</label>
+            <input type="password" id="login-password" placeholder="••••••••" required
+              autocomplete="current-password" />
+          </div>
+          <div class="auth-error" id="login-error"></div>
+          <button type="submit" class="btn-primary" id="btn-login-submit">Sign In</button>
+        </form>
+
+        <!-- Register Form -->
+        <form class="auth-form" id="form-register" onsubmit="handleRegister(event)">
+          <div class="form-group">
+            <label for="reg-username">Username</label>
+            <input type="text" id="reg-username" placeholder="choose_a_username" required autocomplete="username" />
+          </div>
+          <div class="form-group">
+            <label for="reg-email">Email (optional)</label>
+            <input type="email" id="reg-email" placeholder="you@example.com" autocomplete="email" />
+          </div>
+          <div class="form-group">
+            <label for="reg-password">Password</label>
+            <input type="password" id="reg-password" placeholder="at least 8 characters" required
+              autocomplete="new-password" />
+          </div>
+          <div class="auth-error" id="register-error"></div>
+          <button type="submit" class="btn-primary" id="btn-register-submit">Create Account</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       DASHBOARD SCREEN
+       ============================================================ -->
+  <div id="dashboard-screen">
+    <div class="dashboard-layout">
+
+      <!-- Top Navigation -->
+      <nav class="top-nav">
+        <div class="nav-logo">
+          <span class="logo-wordmark">Striker.IO</span>
+        </div>
+        <div class="nav-center"></div>
+        <div class="nav-right" style="display:flex; gap:0.5rem; align-items:center;">
+          <div class="nav-user">
+            <span class="nav-username" id="nav-username"></span>
+          </div>
+          <button class="btn-secondary" onclick="openSettingsModal()">Settings</button>
+          <button class="btn-secondary" onclick="handleLogout()">Logout</button>
+        </div>
+      </nav>
+
+      <!-- Sidebar -->
+      <aside class="sidebar">
+
+        <!-- Stats -->
+        <div>
+          <div class="sidebar-section-title">Your Stats</div>
+          <div class="stats-grid">
+            <div class="stat-card highlight">
+              <div class="stat-value" id="stat-current-streak">0</div>
+              <div class="stat-label">Current</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value" id="stat-longest-streak">0</div>
+              <div class="stat-label">Best</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value" id="stat-total-days">0</div>
+              <div class="stat-label">Active Days</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value" id="stat-consistency">0%</div>
+              <div class="stat-label">30d Rate</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tasks -->
+        <div>
+          <div class="sidebar-section-title">My Tasks</div>
+
+          <button class="btn-add-task" onclick="openAddTaskModal()" id="btn-add-task" style="margin-top: 0.75rem;">
+            + Add New Task
+          </button>
+        </div>
+
+        <!-- Color Legend -->
+        <div>
+          <div class="sidebar-section-title">Color Guide</div>
+          <div style="display:flex; flex-direction: column; gap: 0.5rem;">
+            <div class="legend-item">
+              <div class="legend-dot"
+                style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1);"></div> No activity
+            </div>
+            <div class="legend-item">
+              <div class="legend-dot" style="background: var(--color-1-l3);"></div> 1 task completed
+            </div>
+            <div class="legend-item">
+              <div class="legend-dot" style="background: var(--color-2-l3);"></div> 2 tasks completed
+            </div>
+            <div class="legend-item">
+              <div class="legend-dot" style="background: var(--color-3-l3);"></div> 3 tasks completed
+            </div>
+            <div class="legend-item">
+              <div class="legend-dot" style="background: var(--color-4-l3);"></div> 4+ tasks completed
+            </div>
+            <div class="legend-item" style="font-size:0.7rem; color: var(--text-muted); margin-top: 0.3rem;">Brighter =
+              more entries</div>
+          </div>
+        </div>
+
+      </aside>
+
+      <!-- Main Content -->
+      <main class="main-content">
+        
+        <!-- Top Tasks Row -->
+        <div class="tasks-section">
+          <div class="sidebar-section-title" style="margin-bottom: 1rem;">My Tasks</div>
+          <div class="task-list" id="task-list">
+            <div class="empty-state" style="padding: 1.5rem;">
+              <div class="empty-state-desc">No tasks yet. Add one below!</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Calendar -->
+        <div class="calendar-section">
+          <div class="section-header">
+            <div>
+              <div class="section-title">Contribution Graph</div>
+              <div class="section-subtitle">Your last 365 days of activity</div>
+            </div>
+            <div class="nav-streak-badge" id="nav-streak-badge">
+              <span class="streak-flame"></span>
+              <span id="nav-streak-count">0</span> day streak
+            </div>
+          </div>
+          <div class="calendar-wrapper">
+            <div id="calendar-grid-container" class="calendar-grid-container">
+              <!-- Dynamically rendered by JS -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="activity-section">
+          <div class="section-header">
+            <div>
+              <div class="section-title">Recent Commits</div>
+              <div class="section-subtitle">Your latest progress entries</div>
+            </div>
+          </div>
+          <div class="activity-list" id="activity-list">
+            <div class="activity-empty">No activity yet. Start logging your progress!</div>
+          </div>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       TOOLTIP
+       ============================================================ -->
+  <div class="cell-tooltip" id="cell-tooltip"></div>
+
+  <!-- ============================================================
+       MODALS
+       ============================================================ -->
+
+  <!-- Add Task Modal -->
+  <div class="modal-overlay" id="modal-add-task">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div class="modal-title">Add New Task</div>
+        <button class="modal-close" onclick="closeModal('modal-add-task')">✕</button>
+      </div>
+      <div class="modal-form">
+        <div class="form-group">
+          <label>Task Name</label>
+          <input type="text" id="new-task-name" placeholder="e.g. Coding, Reading, Exercise..." />
+        </div>
+
+
+        <div class="auth-error" id="add-task-error"></div>
+        <button class="btn-primary" onclick="handleAddTask()" id="btn-submit-task">Add Task</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Commit Log Modal -->
+  <div class="modal-overlay" id="modal-commit">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div class="modal-title">Log Your Progress</div>
+        <button class="modal-close" onclick="closeModal('modal-commit')">✕</button>
+      </div>
+      <div class="modal-form">
+        <div class="commit-task-info" id="commit-task-info">
+          <span class="commit-task-icon" id="commit-task-icon"></span>
+          <span class="commit-task-name" id="commit-task-name">Task Name</span>
+        </div>
+        <div class="form-group">
+          <label>Date</label>
+          <input type="date" class="date-input" id="commit-date" />
+        </div>
+        <div class="form-group">
+          <label>What did you do?</label>
+          <textarea class="commit-textarea" id="commit-message"
+            placeholder="e.g. Solved 3 LeetCode problems, studied graphs and trees..."></textarea>
+        </div>
+        <div class="commit-error" id="commit-error"></div>
+        <button class="btn-primary" onclick="handleSubmitCommit()" id="btn-submit-commit">Commit Progress</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Day Detail Modal -->
+  <div class="modal-overlay" id="modal-day-detail">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div class="modal-title" id="day-detail-title">Activity</div>
+        <button class="modal-close" onclick="closeModal('modal-day-detail')">✕</button>
+      </div>
+      <div class="day-logs-list" id="day-logs-list">
+        <!-- Rendered by JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings Modal -->
+  <div class="modal-overlay" id="modal-settings">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div class="modal-title">Color Settings</div>
+        <button class="modal-close" onclick="closeModal('modal-settings')">✕</button>
+      </div>
+      <div class="modal-form">
+        <div class="form-group" style="flex-direction: row; justify-content:space-between; align-items:center;">
+          <label style="align-self: center; margin: 0;">1 Task Completed</label>
+          <input type="color" id="color-pref-1" value="#ef4444" style="width: 40px; height: 40px; padding: 2px; cursor:pointer;" />
+        </div>
+        <div class="form-group" style="flex-direction: row; justify-content:space-between; align-items:center;">
+          <label style="align-self: center; margin: 0;">2 Tasks Completed</label>
+          <input type="color" id="color-pref-2" value="#00c9ff" style="width: 40px; height: 40px; padding: 2px; cursor:pointer;" />
+        </div>
+        <div class="form-group" style="flex-direction: row; justify-content:space-between; align-items:center;">
+          <label style="align-self: center; margin: 0;">3 Tasks Completed</label>
+          <input type="color" id="color-pref-3" value="#f97316" style="width: 40px; height: 40px; padding: 2px; cursor:pointer;" />
+        </div>
+        <div class="form-group" style="flex-direction: row; justify-content:space-between; align-items:center;">
+          <label style="align-self: center; margin: 0;">4+ Tasks Completed</label>
+          <input type="color" id="color-pref-4" value="#10b981" style="width: 40px; height: 40px; padding: 2px; cursor:pointer;" />
+        </div>
+        <button class="btn-primary" onclick="saveSettings()">Save Colors</button>
+        <button class="btn-secondary" style="margin-top: 0.5rem; width: 100%" onclick="resetColors()">Reset to Default</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <script src="/static/js/app.js"></script>
+</body>
+
+</html>
