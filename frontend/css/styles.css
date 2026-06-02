@@ -1293,16 +1293,65 @@ body::before {
    RESPONSIVE
    ============================================================ */
 @media (max-width: 768px) {
+  body {
+    height: auto;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+
   .dashboard-layout {
-    grid-template-columns: 1fr;
-    grid-template-rows: 72px auto 1fr;
+    display: flex;
+    flex-direction: column;
+    height: auto;
+    overflow: visible;
   }
 
   .sidebar {
     border-right: none;
-    border-bottom: 1px solid var(--bg-glass-border);
-    max-height: 350px;
+    border-bottom: 1px solid rgba(0, 201, 255, 0.09);
+    max-height: none;
+    padding: 1rem;
   }
 
-  .stats-grid { grid-template-columns: repeat(4, 1fr); }
+  .stats-grid { 
+    grid-template-columns: repeat(2, 1fr); 
+  }
+
+  .top-nav {
+    padding: 0 1rem;
+  }
+  
+  .nav-logo .logo-wordmark {
+    font-size: 1.3rem;
+  }
+  
+  .nav-streak-badge {
+    padding: 0.3rem 0.6rem;
+    font-size: 0.8rem;
+  }
+  
+  .nav-username {
+    display: none; /* Hide username on small screens to save space */
+  }
+
+  .main-content {
+    padding: 1rem;
+    overflow: visible;
+  }
+
+  .calendar-section {
+    padding: 1rem;
+  }
+  
+  .section-title {
+    font-size: 1.2rem;
+  }
+
+  .auth-card {
+    padding: 1.5rem;
+  }
+  
+  .auth-logo .logo-wordmark {
+    font-size: 2.2rem;
+  }
 }
