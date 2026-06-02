@@ -1,96 +1,130 @@
-# Striker.IO — Daily Habit Tracker
+<div align="center">
 
-Striker.IO is a beautiful, modern daily habit and streak tracker. It features a GitHub-style contribution graph that visualizes your consistency and growth over time. Designed with a sleek glassmorphism UI and a rich dark mode aesthetic, it makes tracking your daily goals a visually rewarding experience.
+# 🎯 Striker.IO
+### A Beautiful, Modern Daily Habit & Streak Tracker
 
-## ✨ Features
+[![Django](https://img.shields.io/badge/Django_4.2-092E20?style=for-the-badge&logo=django&logoColor=white)](https://www.djangoproject.com/)
+[![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
+[![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white)](https://developer.mozilla.org/en-US/docs/Web/CSS)
+[![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white)](https://developer.mozilla.org/en-US/docs/Web/HTML)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 
-- **Visual Contribution Graph**: See your progress at a glance with a 365-day heat map grid.
-- **Task Management**: Create multiple habits or tasks and track them individually with customized colors and icons.
-- **Streak Tracking**: Automatically calculates and displays your current and best streaks to keep you motivated.
-- **Daily Logging**: Log your activities and view your recent commits/progress entries.
-- **Glassmorphism UI**: Beautiful, responsive, single-page application design with interactive hover effects and fluid layout.
-- **User Authentication**: Secure signup and login to keep your data private.
-- **Customizable**: Set specific color preferences based on your activity levels.
+**Striker.IO** is an elegant daily habit and streak tracker. It features a GitHub-style contribution graph that visualizes your consistency and growth over time. Designed with a sleek glassmorphism UI and a rich dark mode aesthetic, it makes tracking your daily goals a visually rewarding experience.
 
-## 🛠️ Tech Stack
+[API Documentation](http://localhost:8000/) · [Report a Bug](https://github.com/yourusername/striker.io/issues)
 
-- **Frontend**: Vanilla HTML5, CSS3 (Custom Properties, Grid/Flexbox), and JavaScript (ES6+).
-- **Backend**: Django (Python 4.2+).
-- **Database**: PostgreSQL (configured for Supabase, but works with any standard Postgres setup).
-- **Architecture**: Single-page frontend layout integrated directly with Django templates and static file serving.
+</div>
 
-## 🚀 Getting Started
+---
 
-### Prerequisites
+## 📖 Project Overview
 
-- Python 3.8 or higher
-- PostgreSQL (or a Supabase account)
-- Git
+Striker.IO simplifies personal growth by turning habit tracking into a visual achievement. Whether you're coding, exercising, or reading, every daily log fills out your contribution grid, reinforcing your consistency. 
 
-### Installation
+### Core Value Proposition
+- **Visual Motivation**: See your 365-day progress at a glance with a heatmap grid.
+- **Flawless Design**: A premium, responsive glassmorphism UI that feels native and fluid.
+- **Frictionless Logging**: A single-page application that requires no page reloads to update your progress.
+- **Customizable Experience**: Color code your tasks depending on intensity or category.
 
-1. **Clone the repository:**
-   ```bash
-   git clone <your-repo-url>
-   cd <your-repo-directory>
-   ```
+---
 
-2. **Set up a virtual environment:**
-   ```bash
-   cd backend
-   python -m venv venv
-   # On Windows:
-   venv\Scripts\activate
-   # On macOS/Linux:
-   source venv/bin/activate
-   ```
+## 🏗️ System Architecture
 
-3. **Install dependencies:**
-   ```bash
-   pip install -r requirements.txt
-   ```
+Striker.IO utilizes a robust, hybrid architecture:
 
-4. **Environment Variables:**
-   Copy the example environment file and update it with your database credentials:
-   ```bash
-   cp .env.example .env
-   ```
-   *Edit `.env` and fill in your PostgreSQL/Supabase connection details.*
+### 🐍 Backend: Django Engine
+The backend is a secure, monolithic Python application built with **Django**. It provides the core API and serves the frontend seamlessly.
+- **Data Models**: Relational schemas for Users, Tasks, and Daily Logs.
+- **Authentication**: Built-in Django Auth integrated for secure, private user accounts.
+- **PostgreSQL**: Scalable database configured out-of-the-box (compatible with Supabase).
 
-5. **Apply Database Migrations:**
-   ```bash
-   python manage.py migrate
-   ```
+### ⚡ Frontend: Vanilla Glassmorphism UI
+The frontend is a lightweight, dependency-free **Vanilla HTML/CSS/JS** application.
+- **Reactive DOM**: Optimized vanilla JavaScript (ES6+) for dynamic UI updates and API calls.
+- **CSS Grid/Flexbox Layout**: A perfectly proportioned, static single-page layout (100vh) designed to never scroll externally.
+- **Design System**: A sleek, dark-themed aesthetic with animated background meshes, glass orbs, and backdrop-filters.
 
-6. **Run the Development Server:**
-   ```bash
-   python manage.py runserver
-   ```
+---
 
-7. **Access the Application:**
-   Open your browser and navigate to `http://127.0.0.1:8000/`.
+## 📂 Project Structure
 
-## 📁 Project Structure
-
-```
-├── backend/
-│   ├── manage.py               # Django management script
-│   ├── requirements.txt        # Python dependencies
-│   ├── striker_project/        # Core Django settings & routing
-│   └── striker_app/            # Main application (Models, Views, Auth)
-├── frontend/                   # Frontend assets
-│   ├── index.html              # Main single-page application layout
+```text
+.
+├── backend/                # Python Django Backend
+│   ├── manage.py           # Django management script
+│   ├── requirements.txt    # Python dependencies
+│   ├── striker_project/    # Core Django settings & routing
+│   │   ├── settings.py     # Configuration (DB, Static, Apps)
+│   │   └── urls.py         # Global URL routing
+│   └── striker_app/        # Main application logic
+│       ├── models.py       # User, Task, and Log models
+│       └── views.py        # API endpoints and logic
+├── frontend/               # Frontend Assets (served by Django)
+│   ├── index.html          # Main single-page application layout
 │   ├── css/
-│   │   └── styles.css          # Core styles, glassmorphism UI
+│   │   └── styles.css      # Core styles, animations, glassmorphism
 │   └── js/
-│       └── app.js              # Frontend logic, API calls, dynamic rendering
-└── README.md
+│       └── app.js          # Client-side logic, API interactions
+├── .env.example            # Environment variables template
+├── .gitignore              # Git ignore rules
+└── README.md               # Project Overview (This file)
 ```
 
-## 🤝 Contributing
+---
 
-Contributions, issues, and feature requests are welcome! Feel free to check the issues page.
+## 🚀 Key Features
 
-## 📝 License
+### 📊 Progress Tracking
+*   **🌐 Visual Contribution Graph**: A dynamic 365-day heat map highlighting your activity.
+*   **🔥 Streak Tracking**: Automatic calculation of your current and best all-time streaks.
+*   **📈 Recent Commits**: A dedicated log of your most recent activity entries.
 
-This project is licensed under the MIT License.
+### 🎨 Customization & UI
+*   **🎨 Color Themes**: Choose from multiple vibrant gradient themes for individual tasks.
+*   **🖌️ Dynamic Styling**: Adjustable opacity settings to represent task intensity ("Brighter = more entries").
+*   **📱 Responsive Layout**: Flawless scaling from desktop to mobile without vertical scrolling.
+
+---
+
+## 🏁 Getting Started
+
+### 1. Configure the Environment
+Clone the repository and set up your environment variables for PostgreSQL:
+```bash
+git clone https://github.com/yourusername/striker.io.git
+cd striker.io/backend
+python -m venv venv
+
+# On Windows:
+venv\Scripts\activate
+# On macOS/Linux:
+source venv/bin/activate
+
+pip install -r requirements.txt
+cp .env.example .env
+```
+*Edit `.env` and fill in your PostgreSQL/Supabase connection details.*
+
+### 2. Initialize the Database
+```bash
+python manage.py migrate
+```
+
+### 3. Launch the Server
+```bash
+python manage.py runserver
+```
+
+### 4. Start Tracking
+1. Open `http://localhost:8000`
+2. Create an account or sign in.
+3. Add a new task and start logging your progress!
+
+---
+
+<div align="center">
+  <p>Built with ❤️ for Personal Growth</p>
+  <p>Developed by <strong>Priyan</strong></p>
+  <p>© 2026 Striker.IO Platform. All Rights Reserved.</p>
+</div>
