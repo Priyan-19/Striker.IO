@@ -144,7 +144,7 @@ body::before {
 /* ============================================================
    SCROLLBAR
    ============================================================ */
-::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar { width: 5px; height: 6px; }
 ::-webkit-scrollbar-track { background: var(--bg-base); }
 ::-webkit-scrollbar-thumb { background: var(--bg-glass-border); border-radius: 10px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--brand-primary); }
@@ -1306,6 +1306,7 @@ body::before {
     width: 100%;
     max-width: 100vw;
     overflow-x: hidden;
+    gap: 1rem;
   }
 
   .sidebar, .main-content {
@@ -1382,7 +1383,7 @@ body::before {
   .calendar-section {
     order: 3;
     padding: 1rem;
-    margin: 0 1rem 1rem 1rem;
+    margin: 0 1rem;
     width: calc(100% - 2rem);
     max-width: 100vw;
   }
