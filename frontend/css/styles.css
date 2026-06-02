@@ -1328,6 +1328,19 @@ body::before {
     padding-bottom: 2rem;
   }
 
+  #color-guide-grid {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+  }
+
+  #color-guide-grid > div:nth-child(2) { order: 1; }
+  #color-guide-grid > div:nth-child(3) { order: 2; }
+  #color-guide-grid > div:nth-child(4) { order: 3; }
+  #color-guide-grid > div:nth-child(5) { order: 4; }
+  #color-guide-grid > div:nth-child(1) { order: 5; }
+  #color-guide-grid > div:nth-child(6) { order: 6; }
+
   .stats-grid { 
     grid-template-columns: repeat(2, 1fr); 
   }
