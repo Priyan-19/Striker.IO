@@ -1329,10 +1329,16 @@ body::before {
     padding-bottom: 2rem;
   }
 
+  .sidebar > div:nth-child(3) .sidebar-section-title {
+    text-align: center;
+  }
+
   #color-guide-grid {
     display: grid !important;
-    grid-template-columns: 1fr 1fr;
-    gap: 0.5rem;
+    grid-template-columns: auto auto;
+    justify-content: center;
+    column-gap: 1.5rem;
+    row-gap: 0.75rem;
   }
 
   #color-guide-grid > div:nth-child(2) { order: 1; }
