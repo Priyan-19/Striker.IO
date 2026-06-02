@@ -60,11 +60,16 @@ async function apiFetch(url, options = {}) {
       'Content-Type': 'application/json',
       'X-CSRFToken': getCsrfToken(),
     },
-    credentials: 'same-origin',
+    credentials: 'include', // Needed for cross-origin cookies
   };
-  const response = await fetch(url, { ...defaults, ...options, headers: { ...defaults.headers, ...(options.headers || {}) } });
-  const data = await response.json().catch(() => ({}));
-  return { ok: response.ok, status: response.status, data };
+  try {
+    const response = await fetch(url, { ...defaults, ...options, headers: { ...defaults.headers, ...(options.headers || {}) } });
+    const data = await response.json().catch(() => ({}));
+    return { ok: response.ok, status: response.status, data };
+  } catch (err) {
+    console.error('Network Error:', err);
+    return { ok: false, status: 0, data: { error: 'Network error. Please make sure BASE_URL is set to your actual Render URL.' } };
+  }
 }
 
 function showToast(message, type = 'success') {
