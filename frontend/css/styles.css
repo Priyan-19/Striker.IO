@@ -1307,8 +1307,10 @@ body::before {
   }
 
   .sidebar {
+    order: 2;
     border-right: none;
-    border-bottom: 1px solid rgba(0, 201, 255, 0.09);
+    border-top: 1px solid rgba(0, 201, 255, 0.09);
+    border-bottom: none;
     max-height: none;
     padding: 1rem;
   }
@@ -1335,6 +1337,7 @@ body::before {
   }
 
   .main-content {
+    order: 1;
     padding: 1rem;
     overflow: visible;
   }
