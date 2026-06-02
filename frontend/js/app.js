@@ -3,17 +3,21 @@
    Main Application Logic
    ============================================================ */
 
+const IS_PROD = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
+// IMPORTANT: Update this URL once you deploy your backend to Render!
+const BASE_URL = IS_PROD ? 'https://your-backend-app.onrender.com' : '';
+
 const API = {
-  register: '/api/auth/register/',
-  login: '/api/auth/login/',
-  logout: '/api/auth/logout/',
-  me: '/api/auth/me/',
-  tasks: '/api/tasks/',
-  task: (id) => `/api/tasks/${id}/`,
-  logs: '/api/logs/',
-  calendar: '/api/calendar/',
-  streaks: '/api/streaks/',
-  day: (date) => `/api/day/${date}/`,
+  register: `${BASE_URL}/api/auth/register/`,
+  login: `${BASE_URL}/api/auth/login/`,
+  logout: `${BASE_URL}/api/auth/logout/`,
+  me: `${BASE_URL}/api/auth/me/`,
+  tasks: `${BASE_URL}/api/tasks/`,
+  task: (id) => `${BASE_URL}/api/tasks/${id}/`,
+  logs: `${BASE_URL}/api/logs/`,
+  calendar: `${BASE_URL}/api/calendar/`,
+  streaks: `${BASE_URL}/api/streaks/`,
+  day: (date) => `${BASE_URL}/api/day/${date}/`,
 };
 
 // ============================================================
