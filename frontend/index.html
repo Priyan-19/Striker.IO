@@ -8,7 +8,7 @@
   <meta name="description"
     content="Track your daily habits and streaks with Striker.IO — a visual contribution grid that shows your consistency and growth over time." />
   <link rel="icon" type="image/png" href="/favicon.png" />
-  <link rel="stylesheet" href="/css/styles.css?v=10" />
+  <link rel="stylesheet" href="/css/styles.css?v=11" />
 </head>
 
 <body>
@@ -118,6 +118,14 @@
           </div>
         </div>
 
+        <!-- Tasks -->
+        <div>
+          <div class="sidebar-section-title">My Tasks</div>
+
+          <button class="btn-add-task" onclick="openAddTaskModal()" id="btn-add-task" style="margin-top: 0.75rem;">
+            + Add New Task
+          </button>
+        </div>
 
         <!-- Color Legend -->
         <div>
@@ -157,9 +165,6 @@
               <div class="empty-state-desc">No tasks yet. Add one below!</div>
             </div>
           </div>
-          <button class="btn-add-task" onclick="openAddTaskModal()" id="btn-add-task" style="margin-top: 1rem;">
-            + Add New Task
-          </button>
         </div>
 
         <!-- Calendar -->

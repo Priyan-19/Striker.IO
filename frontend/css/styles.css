@@ -1346,15 +1346,23 @@ body::before {
   }
 
   .main-content {
+    display: contents; /* flattens children so they can be reordered */
+  }
+  
+  .tasks-section {
     order: 1;
     padding: 1rem;
     width: 100%;
     max-width: 100vw;
-    overflow: hidden; /* prevents stretching from child elements */
+    overflow: hidden;
   }
 
   .calendar-section {
+    order: 3;
     padding: 1rem;
+    margin: 0 1rem 1rem 1rem;
+    width: calc(100% - 2rem);
+    max-width: 100vw;
   }
   
   .section-title {
