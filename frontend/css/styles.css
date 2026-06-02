@@ -1323,19 +1323,17 @@ body::before {
 
   .top-nav {
     padding: 0 1rem;
+    min-height: 64px;
+    align-items: center;
+  }
+  
+  .nav-right .btn-secondary {
+    padding: 0.4rem 0.75rem;
+    font-size: 0.75rem;
   }
   
   .nav-logo .logo-wordmark {
-    font-size: 1.2rem;
-  }
-  
-  .nav-right {
-    gap: 0.3rem !important;
-  }
-  
-  .top-nav .btn-secondary {
-    padding: 0.4rem 0.6rem;
-    font-size: 0.75rem;
+    font-size: 1.3rem;
   }
   
   .nav-streak-badge {
