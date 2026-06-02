@@ -1308,13 +1308,24 @@ body::before {
     overflow-x: hidden;
   }
 
-  .sidebar {
+  .sidebar, .main-content {
+    display: contents; /* flattens children so they can be reordered */
+  }
+
+  .sidebar > div:nth-child(1) {
     order: 2;
-    border-right: none;
-    border-top: 1px solid rgba(0, 201, 255, 0.09);
-    border-bottom: none;
-    max-height: none;
+    padding: 1rem 1rem 0 1rem;
+  }
+
+  .sidebar > div:nth-child(2) {
+    order: 5;
     padding: 1rem;
+  }
+
+  .sidebar > div:nth-child(3) {
+    order: 6;
+    padding: 1rem;
+    padding-bottom: 2rem;
   }
 
   .stats-grid { 
@@ -1345,9 +1356,7 @@ body::before {
     display: none; /* Hide username on small screens to save space */
   }
 
-  .main-content {
-    display: contents; /* flattens children so they can be reordered */
-  }
+
   
   .tasks-section {
     order: 1;
@@ -1362,6 +1371,13 @@ body::before {
     padding: 1rem;
     margin: 0 1rem 1rem 1rem;
     width: calc(100% - 2rem);
+    max-width: 100vw;
+  }
+
+  .activity-section {
+    order: 4;
+    padding: 1rem;
+    width: 100%;
     max-width: 100vw;
   }
   
