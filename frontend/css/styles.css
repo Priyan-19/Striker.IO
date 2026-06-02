@@ -1326,7 +1326,16 @@ body::before {
   }
   
   .nav-logo .logo-wordmark {
-    font-size: 1.3rem;
+    font-size: 1.2rem;
+  }
+  
+  .nav-right {
+    gap: 0.3rem !important;
+  }
+  
+  .top-nav .btn-secondary {
+    padding: 0.4rem 0.6rem;
+    font-size: 0.75rem;
   }
   
   .nav-streak-badge {
