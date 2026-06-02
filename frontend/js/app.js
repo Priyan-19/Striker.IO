@@ -5,7 +5,7 @@
 
 const IS_PROD = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
 // IMPORTANT: Update this URL once you deploy your backend to Render!
-const BASE_URL = IS_PROD ? 'https://your-backend-app.onrender.com' : '';
+const BASE_URL = IS_PROD ? 'https://striker-io.onrender.com' : '';
 
 const API = {
   register: `${BASE_URL}/api/auth/register/`,
@@ -378,7 +378,7 @@ function renderCalendar() {
   }
 
   // Render month labels row
-  const MONTH_NAMES = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   const WEEK_CELL_WIDTH = 17; // 14px + 3px gap
 
   let monthRow = '<div class="calendar-months">';
