@@ -505,13 +505,13 @@ function render3DCalendar() {
     ThreeState.scene = new THREE.Scene();
 
     const aspect = width / height;
-    const d = 16;
+    const d = 10;
     ThreeState.camera = new THREE.OrthographicCamera(
       -d * aspect, d * aspect,
       d, -d,
       1, 1000
     );
-    ThreeState.camera.position.set(20, 20, 20);
+    ThreeState.camera.position.set(5, 14, 15);
     ThreeState.camera.lookAt(0, 0, 0);
 
     ThreeState.controls = new THREE.OrbitControls(ThreeState.camera, ThreeState.renderer.domElement);
@@ -546,7 +546,7 @@ function render3DCalendar() {
   } else {
     ThreeState.renderer.setSize(width, height);
     const aspect = width / height;
-    const d = 16;
+    const d = 10;
     ThreeState.camera.left = -d * aspect;
     ThreeState.camera.right = d * aspect;
     ThreeState.camera.top = d;
@@ -623,7 +623,7 @@ function render3DCalendar() {
       let totalLogs = 0;
 
       if (isFuture) {
-        colorStr = '#0d1527';
+        colorStr = '#131926';
       } else if (info) {
         isLogged = true;
         uniqueTasks = info.unique_tasks;
@@ -632,7 +632,7 @@ function render3DCalendar() {
         const taskGroup = Math.min(uniqueTasks, 4);
         colorStr = themeColors[taskGroup] || '#7c3aed';
       } else {
-        colorStr = '#1b2336';
+        colorStr = '#242f48';
       }
 
       const geometry = new THREE.BoxGeometry(barWidth, 1, barDepth);
@@ -801,7 +801,7 @@ function setup3DEvents(container) {
     ThreeState.renderer.setSize(w, h);
     
     const aspect = w / h;
-    const d = 16;
+    const d = 10;
     ThreeState.camera.left = -d * aspect;
     ThreeState.camera.right = d * aspect;
     ThreeState.camera.top = d;
