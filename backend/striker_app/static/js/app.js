@@ -31,6 +31,23 @@ const State = {
   selectedIcon: '🎯',
   selectedColor: 'blue',
   today: new Date().toISOString().split('T')[0],
+  viewMode: localStorage.getItem('striker_view_mode') || '3d',
+};
+
+let ThreeState = {
+  renderer: null,
+  scene: null,
+  camera: null,
+  controls: null,
+  barsGroup: null,
+  hoveredBar: null,
+  animationFrameId: null,
+};
+const DEFAULT_COLORS = {
+  c1: '#ef4444',
+  c2: '#3b82f6',
+  c3: '#f97316',
+  c4: '#a855f7'
 };
 
 const ICONS = ['🎯', '💻', '📚', '🏋️', '🧠', '✏️', '🎵', '🌍', '🔬', '📊', '🏃', '🎨', '📝', '💡', '🚀', '⚡'];
@@ -188,6 +205,36 @@ async function showDashboard() {
   document.getElementById('dashboard-screen').style.display = 'block';
   document.getElementById('nav-username').textContent = State.user?.username || '';
   await Promise.all([loadTasks(), loadCalendar(), loadStreaks(), loadRecentLogs()]);
+  switchViewMode(State.viewMode);
+}
+
+function switchViewMode(mode) {
+  State.viewMode = mode;
+  localStorage.setItem('striker_view_mode', mode);
+
+  const btn2d = document.getElementById('btn-view-2d');
+  const btn3d = document.getElementById('btn-view-3d');
+  const container2d = document.getElementById('calendar-grid-container');
+  const container3d = document.getElementById('calendar-3d-container');
+
+  if (mode === '2d') {
+    if (btn2d) btn2d.classList.add('active');
+    if (btn3d) btn3d.classList.remove('active');
+    if (container2d) container2d.style.display = 'inline-flex';
+    if (container3d) container3d.style.display = 'none';
+
+    if (ThreeState.animationFrameId) {
+      cancelAnimationFrame(ThreeState.animationFrameId);
+      ThreeState.animationFrameId = null;
+    }
+  } else {
+    if (btn2d) btn2d.classList.remove('active');
+    if (btn3d) btn3d.classList.add('active');
+    if (container2d) container2d.style.display = 'none';
+    if (container3d) container3d.style.display = 'block';
+
+    render3DCalendar();
+  }
 }
 
 // ============================================================
@@ -346,6 +393,9 @@ async function loadCalendar() {
     State.calendarData = data.calendar;
     State.today = data.today;
     renderCalendar();
+    if (State.viewMode === '3d') {
+      render3DCalendar();
+    }
   }
 }
 
@@ -442,6 +492,378 @@ function renderCalendar() {
       <div class="calendar-columns">${weeksHtml}</div>
     </div>
   `;
+}
+
+// ============================================================
+// 3D CALENDAR (THREE.JS)
+// ============================================================
+function render3DCalendar() {
+  const container = document.getElementById('calendar-3d-container');
+  if (!container) return;
+
+  const width = container.clientWidth || 800;
+  const height = container.clientHeight || 350;
+
+  if (!ThreeState.renderer) {
+    ThreeState.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    ThreeState.renderer.setSize(width, height);
+    ThreeState.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    ThreeState.renderer.shadowMap.enabled = true;
+    ThreeState.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    container.appendChild(ThreeState.renderer.domElement);
+
+    ThreeState.scene = new THREE.Scene();
+
+    const aspect = width / height;
+    const d = 16;
+    ThreeState.camera = new THREE.OrthographicCamera(
+      -d * aspect, d * aspect,
+      d, -d,
+      1, 1000
+    );
+    ThreeState.camera.position.set(20, 20, 20);
+    ThreeState.camera.lookAt(0, 0, 0);
+
+    ThreeState.controls = new THREE.OrbitControls(ThreeState.camera, ThreeState.renderer.domElement);
+    ThreeState.controls.enableDamping = true;
+    ThreeState.controls.dampingFactor = 0.05;
+    ThreeState.controls.maxPolarAngle = Math.PI / 2 - 0.05;
+    ThreeState.controls.minZoom = 0.5;
+    ThreeState.controls.maxZoom = 3.0;
+    ThreeState.controls.target.set(0, 0, 0);
+
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.45);
+    ThreeState.scene.add(ambientLight);
+
+    const dirLight = new THREE.DirectionalLight(0xffffff, 0.85);
+    dirLight.position.set(-15, 30, 15);
+    dirLight.castShadow = true;
+    dirLight.shadow.mapSize.width = 1024;
+    dirLight.shadow.mapSize.height = 1024;
+    dirLight.shadow.camera.left = -25;
+    dirLight.shadow.camera.right = 25;
+    dirLight.shadow.camera.top = 25;
+    dirLight.shadow.camera.bottom = -25;
+    dirLight.shadow.camera.near = 0.5;
+    dirLight.shadow.camera.far = 100;
+    dirLight.shadow.bias = -0.0005;
+    ThreeState.scene.add(dirLight);
+
+    ThreeState.barsGroup = new THREE.Group();
+    ThreeState.scene.add(ThreeState.barsGroup);
+
+    setup3DEvents(container);
+  } else {
+    ThreeState.renderer.setSize(width, height);
+    const aspect = width / height;
+    const d = 16;
+    ThreeState.camera.left = -d * aspect;
+    ThreeState.camera.right = d * aspect;
+    ThreeState.camera.top = d;
+    ThreeState.camera.bottom = -d;
+    ThreeState.camera.updateProjectionMatrix();
+  }
+
+  while (ThreeState.barsGroup.children.length > 0) {
+    const obj = ThreeState.barsGroup.children[0];
+    ThreeState.barsGroup.remove(obj);
+    if (obj.geometry) obj.geometry.dispose();
+    if (obj.material) {
+      if (Array.isArray(obj.material)) {
+        obj.material.forEach(m => m.dispose());
+      } else {
+        obj.material.dispose();
+      }
+    }
+  }
+
+  const todayStr = State.today;
+  const today = new Date(todayStr + 'T00:00:00Z');
+
+  const startDate = new Date(today);
+  startDate.setUTCDate(startDate.getUTCDate() - 364);
+  startDate.setUTCDate(startDate.getUTCDate() - startDate.getUTCDay());
+
+  const weeks = [];
+  let current = new Date(startDate);
+  while (current <= today || weeks.length < 53) {
+    const week = [];
+    for (let d = 0; d < 7; d++) {
+      week.push(new Date(current));
+      current.setUTCDate(current.getUTCDate() + 1);
+    }
+    weeks.push(week);
+    if (weeks.length >= 53) break;
+  }
+
+  const colSpacing = 0.65;
+  const rowSpacing = 0.65;
+  const colOffset = (53 * colSpacing) / 2;
+  const rowOffset = (7 * rowSpacing) / 2;
+
+  const savedColors = JSON.parse(localStorage.getItem('striker_theme_colors')) || DEFAULT_COLORS;
+  
+  const themeColors = {
+    1: savedColors.c1 || '#ef4444',
+    2: savedColors.c2 || '#3b82f6',
+    3: savedColors.c3 || '#f97316',
+    4: savedColors.c4 || '#a855f7'
+  };
+
+  const barWidth = 0.5;
+  const barDepth = 0.5;
+  const baseTileHeight = 0.08;
+
+  const targetScales = [];
+
+  weeks.forEach((week, colIndex) => {
+    week.forEach((day, rowIndex) => {
+      const dStr = day.toISOString().split('T')[0];
+      const info = State.calendarData[dStr];
+      const isToday = dStr === todayStr;
+      const isFuture = dStr > todayStr;
+
+      const px = colIndex * colSpacing - colOffset;
+      const pz = rowIndex * rowSpacing - rowOffset;
+
+      let height = baseTileHeight;
+      let colorStr = 'rgba(255, 255, 255, 0.05)';
+      let isLogged = false;
+      let uniqueTasks = 0;
+      let totalLogs = 0;
+
+      if (isFuture) {
+        colorStr = '#0d1527';
+      } else if (info) {
+        isLogged = true;
+        uniqueTasks = info.unique_tasks;
+        totalLogs = info.total_logs;
+        height = baseTileHeight + Math.min(totalLogs * 0.4, 2.8);
+        const taskGroup = Math.min(uniqueTasks, 4);
+        colorStr = themeColors[taskGroup] || '#7c3aed';
+      } else {
+        colorStr = '#1b2336';
+      }
+
+      const geometry = new THREE.BoxGeometry(barWidth, 1, barDepth);
+      geometry.translate(0, 0.5, 0);
+
+      let material;
+      if (isLogged) {
+        material = new THREE.MeshStandardMaterial({
+          color: new THREE.Color(colorStr),
+          roughness: 0.15,
+          metalness: 0.1,
+        });
+      } else {
+        material = new THREE.MeshStandardMaterial({
+          color: new THREE.Color(colorStr),
+          roughness: 0.6,
+          metalness: 0.05,
+          transparent: isFuture,
+          opacity: isFuture ? 0.15 : 0.8
+        });
+      }
+
+      const mesh = new THREE.Mesh(geometry, material);
+      mesh.position.set(px, 0, pz);
+      mesh.castShadow = true;
+      mesh.receiveShadow = true;
+
+      mesh.userData = {
+        date: dStr,
+        isLogged: isLogged,
+        uniqueTasks: uniqueTasks,
+        totalLogs: totalLogs,
+        baseColor: colorStr,
+        isToday: isToday
+      };
+
+      mesh.scale.set(1, 0.01, 1);
+      ThreeState.barsGroup.add(mesh);
+
+      targetScales.push({
+        mesh: mesh,
+        targetHeight: height
+      });
+
+      if (isToday) {
+        const todayGeo = new THREE.BoxGeometry(barWidth + 0.1, 0.02, barDepth + 0.1);
+        const todayMat = new THREE.MeshBasicMaterial({
+          color: 0x00c9ff,
+          transparent: true,
+          opacity: 0.8
+        });
+        const todayMesh = new THREE.Mesh(todayGeo, todayMat);
+        todayMesh.position.set(px, 0.01, pz);
+        ThreeState.barsGroup.add(todayMesh);
+      }
+    });
+  });
+
+  if (!ThreeState.animationFrameId) {
+    let animProgress = 0;
+
+    function animate() {
+      ThreeState.animationFrameId = requestAnimationFrame(animate);
+
+      if (animProgress < 1.0) {
+        animProgress += 0.025;
+        targetScales.forEach(item => {
+          const currentH = THREE.MathUtils.lerp(0.01, item.targetHeight, animProgress);
+          item.mesh.scale.set(1, currentH, 1);
+        });
+      }
+
+      if (ThreeState.controls) {
+        ThreeState.controls.update();
+      }
+
+      if (ThreeState.renderer && ThreeState.scene && ThreeState.camera) {
+        ThreeState.renderer.render(ThreeState.scene, ThreeState.camera);
+      }
+    }
+    animate();
+  } else {
+    let animProgress = 0;
+    targetScales.forEach(item => {
+      item.mesh.scale.set(1, 0.01, 1);
+    });
+
+    const animInterval = setInterval(() => {
+      animProgress += 0.05;
+      if (animProgress >= 1.0) {
+        targetScales.forEach(item => {
+          item.mesh.scale.set(1, item.targetHeight, 1);
+        });
+        clearInterval(animInterval);
+      } else {
+        targetScales.forEach(item => {
+          const currentH = THREE.MathUtils.lerp(0.01, item.targetHeight, animProgress);
+          item.mesh.scale.set(1, currentH, 1);
+        });
+      }
+    }, 16);
+  }
+}
+
+function setup3DEvents(container) {
+  const raycaster = new THREE.Raycaster();
+  const mouse = new THREE.Vector2();
+
+  function onPointerMove(event) {
+    const rect = ThreeState.renderer.domElement.getBoundingClientRect();
+    mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+    mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+    raycaster.setFromCamera(mouse, ThreeState.camera);
+    
+    const intersectables = ThreeState.barsGroup.children.filter(child => child.userData && child.userData.date);
+    const intersects = raycaster.intersectObjects(intersectables);
+
+    if (intersects.length > 0) {
+      const hit = intersects[0].object;
+      
+      if (ThreeState.hoveredBar !== hit) {
+        if (ThreeState.hoveredBar) {
+          if (ThreeState.hoveredBar.material && ThreeState.hoveredBar.material.emissive) {
+            ThreeState.hoveredBar.material.emissive.setHex(0x000000);
+          }
+        }
+        
+        ThreeState.hoveredBar = hit;
+        if (hit.material && hit.material.emissive) {
+          hit.material.emissive.setHex(0x222222);
+        }
+      }
+      
+      show3DTooltip(event.clientX, event.clientY, hit.userData.date);
+    } else {
+      if (ThreeState.hoveredBar) {
+        if (ThreeState.hoveredBar.material && ThreeState.hoveredBar.material.emissive) {
+          ThreeState.hoveredBar.material.emissive.setHex(0x000000);
+        }
+        ThreeState.hoveredBar = null;
+      }
+      hideTooltip();
+    }
+  }
+
+  function onPointerClick(event) {
+    const rect = ThreeState.renderer.domElement.getBoundingClientRect();
+    mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+    mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+    raycaster.setFromCamera(mouse, ThreeState.camera);
+    const intersectables = ThreeState.barsGroup.children.filter(child => child.userData && child.userData.date);
+    const intersects = raycaster.intersectObjects(intersectables);
+
+    if (intersects.length > 0) {
+      const hit = intersects[0].object;
+      openDayDetail(hit.userData.date);
+    }
+  }
+
+  const resizeObserver = new ResizeObserver(() => {
+    if (!ThreeState.renderer || !container) return;
+    const w = container.clientWidth;
+    const h = container.clientHeight;
+    ThreeState.renderer.setSize(w, h);
+    
+    const aspect = w / h;
+    const d = 16;
+    ThreeState.camera.left = -d * aspect;
+    ThreeState.camera.right = d * aspect;
+    ThreeState.camera.top = d;
+    ThreeState.camera.bottom = -d;
+    ThreeState.camera.updateProjectionMatrix();
+  });
+  
+  resizeObserver.observe(container);
+
+  ThreeState.renderer.domElement.addEventListener('mousemove', onPointerMove);
+  ThreeState.renderer.domElement.addEventListener('click', onPointerClick);
+}
+
+function show3DTooltip(clientX, clientY, dateStr) {
+  const tooltip = document.getElementById('cell-tooltip');
+  const info = State.calendarData[dateStr];
+
+  let html = `<div class="tooltip-date">${formatDate(dateStr)}</div>`;
+
+  if (!info) {
+    html += `<div class="tooltip-empty">No activity recorded</div>`;
+  } else {
+    html += `<div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:0.5rem;">${info.unique_tasks} task${info.unique_tasks > 1 ? 's' : ''} · ${info.total_logs} log${info.total_logs > 1 ? 's' : ''}</div>`;
+    info.entries.slice(0, 4).forEach(e => {
+      html += `<div class="tooltip-entry">
+        <span>${e.task_icon}</span>
+        <div>
+          <span class="tooltip-task-badge">${escHtml(e.task_name)}</span>
+          <div style="margin-top:0.25rem;color:var(--text-secondary);">${escHtml(e.message.substring(0, 60))}${e.message.length > 60 ? '…' : ''}</div>
+        </div>
+      </div>`;
+    });
+    if (info.entries.length > 4) {
+      html += `<div style="font-size:0.7rem;color:var(--text-muted);margin-top:0.3rem;">+${info.entries.length - 4} more</div>`;
+    }
+  }
+
+  tooltip.innerHTML = html;
+
+  const tooltipWidth = 260;
+  let left = clientX + 15;
+  if (left + tooltipWidth > window.innerWidth - 10) {
+    left = clientX - tooltipWidth - 15;
+  }
+  let top = clientY - 15;
+  if (top + 200 > window.innerHeight) {
+    top = window.innerHeight - 210;
+  }
+
+  tooltip.style.left = left + 'px';
+  tooltip.style.top = top + 'px';
+  tooltip.classList.add('visible');
 }
 
 // ============================================================

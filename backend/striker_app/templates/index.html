@@ -148,11 +148,16 @@
               <div class="section-title">Contribution Graph</div>
               <div class="section-subtitle">Your last 365 days of activity</div>
             </div>
+            <div class="view-toggle-container" id="calendar-view-toggle">
+              <button class="btn-toggle active" id="btn-view-2d" onclick="switchViewMode('2d')">2D Grid</button>
+              <button class="btn-toggle" id="btn-view-3d" onclick="switchViewMode('3d')">3D View</button>
+            </div>
           </div>
           <div class="calendar-wrapper">
             <div id="calendar-grid-container" class="calendar-grid-container">
               <!-- Dynamically rendered by JS -->
             </div>
+            <div id="calendar-3d-container" class="calendar-3d-container" style="display: none; height: 350px; width: 100%; position: relative; border-radius: var(--radius-md); overflow: hidden;"></div>
           </div>
         </div>
 
@@ -254,6 +259,8 @@
   <!-- Toast Container -->
   <div class="toast-container" id="toast-container"></div>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
   <script src="{% static 'js/app.js' %}"></script>
 </body>
 </html>

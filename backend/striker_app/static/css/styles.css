@@ -588,6 +588,49 @@ body::before {
 }
 
 /* Calendar Grid */
+/* View Toggle Button Styles */
+.view-toggle-container {
+  display: flex;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(0, 201, 255, 0.08);
+  border-radius: var(--radius-md);
+  padding: 3px;
+  gap: 3px;
+}
+
+.btn-toggle {
+  padding: 0.4rem 0.85rem;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-secondary);
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.btn-toggle:hover {
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.btn-toggle.active {
+  background: linear-gradient(135deg, #0066ff, #00c9ff);
+  color: white;
+  box-shadow: 0 4px 12px rgba(0, 102, 255, 0.35);
+}
+
+/* 3D Calendar Container */
+.calendar-3d-container {
+  background: rgba(0, 5, 15, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.02);
+  outline: none;
+}
+
+/* Calendar Grid */
 .calendar-wrapper {
   overflow-x: auto;
   padding-bottom: 0.5rem;
